@@ -3,11 +3,11 @@ import { DataSService } from '../../services/data-s.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-second',
-  templateUrl: './second.component.html',
-  styleUrls: ['./second.component.css']
+  selector: 'app-third',
+  templateUrl: './third.component.html',
+  styleUrls: ['./third.component.css']
 })
-export class SecondComponent implements OnInit {
+export class ThirdComponent implements OnInit {
   stepSize = 0.5;
   columnSize = 50;
   rowSize = 60;
@@ -26,8 +26,12 @@ export class SecondComponent implements OnInit {
   keys = [];
   INR = [];
   GBP = [];
-
-  constructor(private data_service: DataSService,private router:Router,private route:ActivatedRoute) { }
+  latestData;
+  curentRates;
+  latestINR;
+  latestGBP;
+  currentDate = "2020-07-16";
+  constructor(private data_service: DataSService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.data_service.getData().subscribe(data => {
@@ -44,10 +48,20 @@ export class SecondComponent implements OnInit {
       this.GBP = this.values.map(element => element.GBP);
       this.init();
     });
+    this.data_service.getLatestData().subscribe(latestData => {
+      this.latestData = latestData;
+      this.curentRates = this.latestData['rates'];
+      this.latestINR = this.curentRates['INR'];
+      this.latestGBP = this.curentRates['GBP'];
+      this.context.fillStyle = "#FF00FF";
+      this.plotPoint(this.latestINR,"INR");
+      this.context.fillStyle = "#FF0000";
+      this.plotPoint(this.latestGBP,"GBP");
+    });
   }
 
   init() {
-    this.sections = 22;
+    this.sections = 23;
     this.Val_max = 85;
     this.Val_min = -2;
     this.canvas = document.getElementById("canvas");
@@ -60,6 +74,7 @@ export class SecondComponent implements OnInit {
 
     this.context.strokeStyle = "#009933";
     this.context.beginPath();
+    this.xAxis.push(this.currentDate);
     for (let i = 1; i < this.sections; i++) {
       var x = i * this.xScale;
       this.context.fillText(this.xAxis[i], x, this.columnSize - this.margin);
@@ -96,8 +111,13 @@ export class SecondComponent implements OnInit {
     }
     this.context.stroke();
   }
+  plotPoint(dataSet,state) {
+    this.context.fillRect(22*this.xScale, dataSet, 10, 0.2);
+    this.context.font = "2px Georgia";
+    this.context.stroke();
+  }
 
-  next(){
-    this.router.navigate(['../t-3'],{relativeTo:this.route});
+  next() {
+    console.log("next");
   }
 }
