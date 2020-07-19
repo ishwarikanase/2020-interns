@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { DataSService } from '../../services/data-s.service';
-import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-first',
-  templateUrl: './first.component.html',
-  styleUrls: ['./first.component.css']
+  selector: 'app-second',
+  templateUrl: './second.component.html',
+  styleUrls: ['./second.component.css']
 })
-export class FirstComponent implements OnInit {
-  stepSize = 2;
+export class SecondComponent implements OnInit {
+  stepSize = 0.5;
   columnSize = 50;
   rowSize = 60;
   margin = 10;
@@ -22,12 +21,12 @@ export class FirstComponent implements OnInit {
   yScale;
   data = [];
   rates = [];
-  hello;
   values = [];
   keys = [];
   INR = [];
+  GBP = [];
 
-  constructor(private data_service: DataSService,private router:Router,private route:ActivatedRoute) { }
+  constructor(private data_service: DataSService) { }
 
   ngOnInit(): void {
     this.data_service.getData().subscribe(data => {
@@ -35,27 +34,29 @@ export class FirstComponent implements OnInit {
       this.rates = this.data['rates'];
       for (let key in this.rates) {
         let splittedKey = key.split("-");
+        console.log(key);
         if (splittedKey[1] === '01') {
           this.xAxis.push(key);
           this.values.push(this.rates[key]);
         }
       }
       this.INR = this.values.map(element => element.INR);
+      console.log('this.INR', this.INR);
+      this.GBP = this.values.map(element => element.GBP);
+      console.log(this.GBP);
       this.init();
     });
   }
 
   init() {
-
     this.sections = 22;
-    this.Val_max = 90;
-    this.Val_min = 60;
-
+    this.Val_max = 85;
+    this.Val_min = -2;
     this.canvas = document.getElementById("canvas");
     this.context = this.canvas.getContext("2d");
     this.context.fillStyle = "#0099ff"
     this.context.font = "20 pt Verdana"
-    this.context.lineWidth = 0.2;
+    // this.context.lineWidth = 0;
 
     this.yScale = (this.canvas.height - this.columnSize - this.margin) / (this.Val_max - this.Val_min);
     this.xScale = (this.canvas.width - this.rowSize) / this.sections;
@@ -82,9 +83,14 @@ export class FirstComponent implements OnInit {
     this.context.translate(this.rowSize, this.canvas.height + this.Val_min * this.yScale);
     this.context.scale(1, -1 * this.yScale);
 
+    this.context.lineWidth = 0.2;
     this.context.strokeStyle = "#000";
     this.plotData(this.INR);
+    this.context.lineWidth = 0.08;
+    this.context.strokeStyle = "#00F";
+    this.plotData(this.GBP);
   }
+
   plotData(dataSet) {
     this.context.beginPath();
     this.context.moveTo(0, dataSet[0]);
@@ -92,9 +98,5 @@ export class FirstComponent implements OnInit {
       this.context.lineTo(i * this.xScale, dataSet[i]);
     }
     this.context.stroke();
-  }
-
-  next(){
-    this.router.navigate(['t-2'],{relativeTo:this.route});
   }
 }
