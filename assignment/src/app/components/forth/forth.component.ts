@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { DataSService } from '../../services/data-s.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { ExchangeRatesAPIService } from '../../services/exchange-rates-api.service';
 
 @Component({
-  selector: 'app-third',
-  templateUrl: './third.component.html',
-  styleUrls: ['./third.component.css']
+  selector: 'app-forth',
+  templateUrl: './forth.component.html',
+  styleUrls: ['./forth.component.css']
 })
-export class ThirdComponent implements OnInit {
+export class ForthComponent implements OnInit {
   stepSize = 0.5;
   columnSize = 50;
   rowSize = 60;
@@ -31,10 +32,10 @@ export class ThirdComponent implements OnInit {
   latestINR;
   latestGBP;
   currentDate = "2020-07-16";
-  constructor(private data_service: DataSService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private exchange_rate_API_service: ExchangeRatesAPIService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.data_service.getData().subscribe(data => {
+    this.exchange_rate_API_service.getData().subscribe(data => {
       this.data = data;
       this.rates = this.data['rates'];
       for (let key in this.rates) {
@@ -48,7 +49,7 @@ export class ThirdComponent implements OnInit {
       this.GBP = this.values.map(element => element.GBP);
       this.init();
     });
-    this.data_service.getLatestData().subscribe(latestData => {
+    this.exchange_rate_API_service.getLatestData().subscribe(latestData => {
       this.latestData = latestData;
       this.curentRates = this.latestData['rates'];
       this.latestINR = this.curentRates['INR'];
@@ -118,7 +119,6 @@ export class ThirdComponent implements OnInit {
   }
 
   next() {
-    // console.log("next");
-    this.router.navigate(['../t-4'], { relativeTo: this.route });
+    console.log("next");
   }
 }
